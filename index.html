@@ -1,0 +1,516 @@
+<html><head><base href="/" /></head>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>고양이 엔터테인먼트 앱</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Jua', Arial, sans-serif;
+    }
+
+    @keyframes floating {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    @keyframes backgroundScroll {
+      0% { background-position: 0 0; }
+      100% { background-position: 100px 100px; }
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: #fff5f7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M30 30c2-2 4-4 6-4s4 2 6 4-2 4-4 6-4 2-6 0-2-4 0-6zm-12 0c2-2 4-4 6-4s4 2 6 4-2 4-4 6-4 2-6 0-2-4 0-6z' stroke='%23ffd1dc' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+      animation: backgroundScroll 20s linear infinite;
+    }
+
+    .page-title {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      color: #ff6b8b;
+      margin-bottom: 3rem;
+      text-align: center;
+      animation: floating 3s ease-in-out infinite;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      padding: 0 1rem;
+    }
+
+    .page-title i {
+      margin: 0 15px;
+      color: #ff8fa3;
+    }
+
+    .container {
+      width: min(95%, 800px);
+      background: white;
+      border-radius: 30px;
+      padding: clamp(1.5rem, 4vw, 3rem);
+      box-shadow: 0 10px 30px rgba(255, 107, 139, 0.1);
+      position: relative;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+
+    .controls {
+      margin: 30px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+      width: 100%;
+    }
+
+    select {
+      padding: 15px 25px;
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      border: 2px solid #ffd1dc;
+      border-radius: 30px;
+      background: white;
+      color: #ff6b8b;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    select:hover {
+      border-color: #ff6b8b;
+      transform: translateY(-2px);
+    }
+
+    .text-input-group {
+      display: flex;
+      gap: 15px;
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 0;
+    }
+
+    input[type="text"] {
+      padding: 15px 25px;
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      border: 2px solid #ffd1dc;
+      border-radius: 30px;
+      flex: 1;
+      min-width: 250px;
+      transition: all 0.3s ease;
+    }
+
+    input[type="text"]:hover {
+      border-color: #ff6b8b;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #ff6b8b;
+      box-shadow: 0 0 15px rgba(255, 107, 139, 0.2);
+    }
+
+    button {
+      padding: 15px 30px;
+      background: #ff6b8b;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(255, 107, 139, 0.2);
+      white-space: nowrap;
+    }
+
+    button.new-cat-btn {
+      width: 100%;
+      margin-top: 2rem;
+      padding: 20px 40px;
+      font-size: clamp(1.2rem, 3vw, 1.5rem);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    button.new-cat-btn i {
+      font-size: 1.3em;
+    }
+
+    .cat-image {
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      margin: 30px auto;
+      border-radius: 20px;
+      display: block;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      object-fit: cover;
+      aspect-ratio: 1 / 1;
+    }
+
+    .loading {
+      font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+      color: #ff6b8b;
+      margin-top: 30px;
+      text-align: center;
+      animation: floating 2s ease-in-out infinite;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      max-width: 90%;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+    }
+
+    .close-modal {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 10px;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .close-modal:hover {
+      color: #ff6b8b;
+    }
+
+    .share-buttons {
+      display: flex;
+      gap: 15px;
+      width: 100%;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .share-button {
+      padding: 12px 25px;
+      background: #8e44ad;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(142, 68, 173, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .share-button:hover {
+      background: #9b59b6;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(142, 68, 173, 0.3);
+    }
+
+    .share-button i {
+      font-size: 1.2em;
+    }
+
+    .toast-message {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 1rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast-message.show {
+      opacity: 1;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 1.5rem;
+      }
+
+      .text-input-group {
+        flex-direction: column;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        max-width: none;
+      }
+
+      button {
+        width: 100%;
+        padding: 18px 30px;
+      }
+
+      .page-title i {
+        display: none;
+      }
+
+      .share-buttons {
+        flex-direction: column;
+      }
+      
+      .share-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">
+    <i class="fas fa-cat"></i>
+    랜덤 고양이 사진
+    <i class="fas fa-cat"></i>
+  </h1>
+  
+  <div class="container">
+    <div class="controls">
+      <select id="catTag">
+        <option value="">태그 선택 (전체)</option>
+        <option value="cute">귀여운</option>
+        <option value="funny">재미있는</option>
+        <option value="sleepy">자는</option>
+      </select>
+      <img src="https://cataas.com/cat" alt="Random Cat" class="cat-image" id="catImage" onclick="openModal()">
+      <div class="text-input-group">
+        <input type="text" id="catText" placeholder="이미지에 추가할 텍스트">
+        <button onclick="applyText()">텍스트 적용</button>
+      </div>
+      <button onclick="loadCustomCat()" class="new-cat-btn">새로운 고양이 보기 <i class="fas fa-paw"></i></button>
+      <div class="share-buttons">
+        <button onclick="downloadImage()" class="share-button">
+          <i class="fas fa-download"></i> 이미지 저장
+        </button>
+        <button onclick="copyToClipboard()" class="share-button">
+          <i class="fas fa-copy"></i> 클립보드에 복사
+        </button>
+      </div>
+    </div>
+    <p class="loading" id="loading" style="display: none;">고양이를 불러오는 중... <i class="fas fa-spinner fa-spin"></i></p>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="imageModal" onclick="closeModal()">
+    <button class="close-modal">&times;</button>
+    <img class="modal-content" id="modalImage">
+  </div>
+
+  <!-- Toast Message -->
+  <div class="toast-message" id="toastMessage"></div>
+
+  <script>
+    let currentImageUrl = '';
+    let originalImage = null;
+
+    async function loadCustomCat() {
+      const catImage = document.getElementById('catImage');
+      const loadingText = document.getElementById('loading');
+      const tag = document.getElementById('catTag').value;
+      
+      loadingText.style.display = 'block';
+
+      try {
+        let url = 'https://cataas.com/cat';
+        
+        if (tag) {
+          url += `/${tag}`;
+        }
+
+        url += `?t=${Date.now()}`;
+        currentImageUrl = url;
+        
+        // 새 이미지 객체 생성
+        const tempImage = new Image();
+        tempImage.crossOrigin = "anonymous";
+        
+        tempImage.onload = () => {
+          // 원본 이미지 저장
+          const canvas = document.createElement('canvas');
+          canvas.width = tempImage.naturalWidth;
+          canvas.height = tempImage.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(tempImage, 0, 0);
+          originalImage = canvas;
+          
+          // 화면에 표시할 이미지 업데이트
+          catImage.src = canvas.toDataURL();
+          loadingText.style.display = 'none';
+        };
+        
+        tempImage.src = url;
+      } catch (error) {
+        console.error('Error loading cat image:', error);
+        loadingText.style.display = 'none';
+      }
+    }
+
+    function drawTextOnImage(text) {
+      if (!originalImage) return;
+      
+      const catImage = document.getElementById('catImage');
+      const canvas = document.createElement('canvas');
+      canvas.width = originalImage.width;
+      canvas.height = originalImage.height;
+      const ctx = canvas.getContext('2d');
+      
+      // 원본 이미지로 초기화
+      ctx.drawImage(originalImage, 0, 0);
+      
+      // 텍스트 설정
+      const fontSize = Math.min(canvas.width, canvas.height) * 0.1;
+      ctx.font = `bold ${fontSize}px Arial`;
+      ctx.fillStyle = 'white';
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = fontSize * 0.1;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      // 텍스트 그리기
+      const x = canvas.width / 2;
+      const y = canvas.height * 0.8;
+      ctx.strokeText(text, x, y);
+      ctx.fillText(text, x, y);
+      
+      // 이미지 업데이트
+      catImage.src = canvas.toDataURL();
+    }
+
+    function applyText() {
+      const text = document.getElementById('catText').value;
+      if (text) {
+        drawTextOnImage(text);
+      }
+    }
+
+    // 초기 이미지 로드
+    window.addEventListener('load', loadCustomCat);
+
+    // 텍스트 입력 필드에서 Enter 키 처리
+    document.getElementById('catText').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        applyText();
+      }
+    });
+
+    function openModal() {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImage');
+      const catImage = document.getElementById('catImage');
+      
+      modal.style.display = 'flex';
+      modalImg.src = catImage.src;
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('imageModal');
+      modal.style.display = 'none';
+    }
+
+    // Close modal when pressing ESC key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    // Prevent modal from closing when clicking on the image
+    document.querySelector('.modal-content').addEventListener('click', function(event) {
+      event.stopPropagation();
+    });
+
+    function showToast(message) {
+      const toast = document.getElementById('toastMessage');
+      toast.textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function downloadImage() {
+      const catImage = document.getElementById('catImage');
+      
+      // 이미지를 캔버스에 그리기
+      const canvas = document.createElement('canvas');
+      canvas.width = catImage.naturalWidth;
+      canvas.height = catImage.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(catImage, 0, 0);
+      
+      // 다운로드 링크 생성
+      const link = document.createElement('a');
+      link.download = 'cat-image.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      
+      showToast('이미지가 다운로드되었습니다! 🐱');
+    }
+
+    async function copyToClipboard() {
+      const catImage = document.getElementById('catImage');
+      
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = catImage.naturalWidth;
+        canvas.height = catImage.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(catImage, 0, 0);
+        
+        const blob = await new Promise(resolve => canvas.toBlob(resolve));
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'image/png': blob
+          })
+        ]);
+        
+        showToast('이미지가 클립보드에 복사되었습니다! 📋');
+      } catch (err) {
+        console.error('클립보드 복사 실패:', err);
+        showToast('클립보드 복사에 실패했습니다. 다시 시도해주세요.');
+      }
+    }
+  </script>
+</body>
+</html>
